@@ -1,5 +1,5 @@
 import numpy as np
-#np.set_printoptions(threshold=np.inf)
+np.set_printoptions(threshold=np.inf)
 import matplotlib.pyplot as plt
 import networkx as nx
 from scipy.stats import multivariate_normal
@@ -7,12 +7,14 @@ from scipy.cluster.hierarchy import dendrogram
 from sklearn.cluster import KMeans, MeanShift
 from sklearn.metrics.cluster import adjusted_mutual_info_score, adjusted_rand_score, v_measure_score
 
+
 from base.helperfunctions import *
-from base.MMD-Algorithm import *
+from base.MMD import *
+from base.MNV import *
 from itertools import combinations
 
 import time
-from random import shuffle
+
 
 
 
@@ -23,23 +25,6 @@ from random import shuffle
 
 
 
-def get_colors():
-    # These are the "Tableau 20" colors as RGB.
-    tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),
-                 (44, 160, 44), (152, 223, 138), (214, 39, 40), (255, 152, 150),
-                 (148, 103, 189), (197, 176, 213), (140, 86, 75), (196, 156, 148),
-                 (227, 119, 194), (247, 182, 210), (127, 127, 127), (199, 199, 199),
-                 (188, 189, 34), (219, 219, 141), (23, 190, 207), (158, 218, 229)]
-
-    # Scale the RGB values to the [0, 1] range, which is the format matplotlib accepts.
-    """for i in range(len(tableau20)):
-        r, g, b = tableau20[i]
-        tableau20[i] = (r / 255., g / 255., b / 255.)
-    """
-    #hexadecimal for scatter (problem interpretation of the rgb vs colorcodecatalogue
-    res = ["#{:02X}{:02X}{:02X}".format(*triple) for triple in tableau20]
-    shuffle(res)
-    return res
 
 #plot
 def myplots(points):
@@ -63,16 +48,6 @@ def plotdemo2(data,cluster,noncluster):
     plt.scatter(x3,y3, s= 10, c = 'green', alpha = 0.5)
     plt.show()
 
-def showres(result, noise=None):
-    colors = get_colors()
-    for i, point_list in enumerate(result):
-        x, y = zip(*point_list)
-        plt.scatter(x, y, c=colors[i % len(colors)])
-
-        if noise:
-            x, y = zip(*noise)
-            plt.scatter(x, y, c='b', marker='o')
-    plt.show()
 
 
 def codeSpecial(data):
@@ -204,32 +179,7 @@ def codeStandard(data):
         print("no zeroes")
     plotdemo(data,contour)
 
-def get_matrix(size, connected):
-    m = np.zeros((size, size))
 
-    for t in connected:
-        x, y = min(t), max(t)
-        m[(x,y)] = 1
-
-    return m
-
-def gen_labels(size, connected):
-    m = get_matrix(size, connected)
-    g = nx.from_numpy_matrix(m)
-    return list(nx.connected_components(g))
-
-
-def gen_results_from_labels(points, labels):
-    result = []
-    noise = []
-    for i in range(len(labels)):
-        if len(labels[i]) > 1:
-            result += [[tuple(points[comp]) for comp in list(labels[i])]]
-        else:
-            noise += [tuple(points[comp]) for comp in list(labels[i])]
-
-    print(result)
-    return result, noise
 
 def dendrogrammofclustering(result):
     plt.figure(figsize=(25,10))
@@ -238,59 +188,6 @@ def dendrogrammofclustering(result):
     plt.ylabel('distance')
     dendrogram(result, leaf_rotation=90, leaf_font_size = 8)
     plt.show()
-
-def agglomutualnearestneighbour(dataset):
-    #matrix nearest neighbours of each point
-    #matrix m1 and D, where neighbourmatrix[0] -> distance, neighbourhoodmatrix[1] --> index of point
-    neighbourhoodmatrix = []
-    for pts in dataset:
-        neighbour = []
-        for idx,pts2 in enumerate(dataset):
-            neighbour += [[mydist(pts,pts2),idx]]
-        neighbour.sort()
-        neighbourhoodmatrix += [neighbour]
-
-    #matrix m2
-    m2_len = len(dataset)
-    m2 = [[0 for x in range(m2_len)] for y in range(m2_len)]
-    for idx, mnv in enumerate(m2):
-        for i in range(m2_len):
-            temp = neighbourhoodmatrix[idx][i][1]
-            #print('temp',temp)
-            item = idx
-            #print('item',item)
-            for jdx, pts in enumerate(neighbourhoodmatrix[temp]):
-                if item  == pts[1]:
-                    if jdx + i > 10:
-                        m2[idx][i] = 2000
-                    else:
-                        m2[idx][i] = jdx + i #mutual neighbourhood value
-                    #print('tempmnv', tempmnv)
-    counter = 0
-    tempcluster = []
-    for mnvvalue in range (2,11):
-        for idx in range(len(m2)):
-
-            for i in range(0,5):# only 5 nearest neighbours - k -->
-                if m2[idx][i] == mnvvalue:
-                    tempdist = neighbourhoodmatrix[idx][i][0] #punkte zu cluster: idx, neighbourhoodmatrix[idx][i][1]
-                    tempcluster += [[[tempdist],[idx], [neighbourhoodmatrix[idx][i][1]]]]
-                if m2[idx][i] <= 10:
-                    counter += 1
-    #print(len(tempcluster),tempcluster)
-    l = [(x[1][0], x[2][0]) for x in tempcluster]
-    #print(l)
-    labels = gen_labels(len(dataset), l)
-    print('LABELS' , labels, len(labels))
-    results, _ = gen_results_from_labels(dataset, labels)
-    #print(results)
-    showres(results)
-    #np.savetxt('test.out', list(zip(*results)), delimiter=',')  # X is an array
-    with open('test.out', "a") as f:
-        print(results, file=f)
-    #print(neighbourhoodmatrix[11])
-    #print(m2[0])
-    #print(counter)
 
 
 
@@ -301,19 +198,13 @@ if __name__ == '__main__':
     start_time = time.time()
     dataset = load_mydataset()
     dataset2 = load_mydataset(True)
-    graph1 = noniterative_clustering(dataset)
-    graph2 = noniterative_clustering(dataset2)
-    print(graph1, graph2)
-    print(graph1 == graph2)
-    counter = 0
-    for idx, i in enumerate(graph1):
-        if not i.all() == graph2[idx].all():
-            counter += 1
-    print(counter)
 
-    #adjacencymatrix sind gleich!
-    test = reader('test.out')
-    test2 = reader('test.out2')
+    agglomutualnearestneighbour(dataset2)
+    #noniterative_clustering(dataset2)
+
+    #0.0128479387995
+    """test = reader('test.out')
+    test2 = reader('test2.out')
     ls = [-1 for i in range(len(dataset))]
     ls2 = [-1 for i in range(len(dataset))]
     for idx, i in enumerate(test):
@@ -322,7 +213,13 @@ if __name__ == '__main__':
     for idx, i in enumerate(test2):
         for j in i:
             ls2[j] = idx
-    #print(v_measure_score())
+
+    print(ls, "LS")
+    print("zwote", ls2)
+
+    print(adjusted_rand_score(ls,ls2[::-1]))
+
+    """
     #dataset = load_dataset_with_labels()
    # plot_true_labels(dataset)
     #codeStandard(dataset)
