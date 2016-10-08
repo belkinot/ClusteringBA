@@ -199,10 +199,12 @@ if __name__ == '__main__':
     dataset = load_mydataset()
     dataset2 = load_mydataset(True)
 
-    agglomutualnearestneighbour(dataset2)
-    #noniterative_clustering(dataset2)
-
+    #agglomutualnearestneighbour(dataset2)
+    #noniterative_clustering(dataset,8)
+    #spatial_separation(dataset)
     #0.0128479387995
+    uniform_density(dataset)
+
     """test = reader('test.out')
     test2 = reader('test2.out')
     ls = [-1 for i in range(len(dataset))]

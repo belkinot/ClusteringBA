@@ -3,7 +3,7 @@ import numpy as np
 from base.helperfunctions import *
 
 
-def noniterative_clustering(data):
+def noniterative_clustering(data, MMD_parameter=2):
 
     #matrix n*n wobei distanzen zu allen punkten enthalten sind --> "noise" wird die distanz auf beliebig großen wert gesetzt
     # matrix(i,j) = distanz zwischen i und j
@@ -18,13 +18,13 @@ def noniterative_clustering(data):
             temp += [mydist(data[i], data[j])]
         mindist += [temp]
 
-    MMD = noisedetect(mindist, idxset, noiseset)
+    MMD = noisedetect(mindist, idxset, noiseset, MMD_parameter)
     print(MMD)
     adjacency_matrix = []
     for idx, distance in enumerate(mindist):
             adjacency_matrix_help = []
             for dist in distance:
-                if dist <= (2* MMD):
+                if dist <= (MMD_parameter* MMD): #MMD-Parameter
                     adjacency_matrix_help.append(1)
                 else:
                     adjacency_matrix_help.append(0)
@@ -41,18 +41,19 @@ def noniterative_clustering(data):
     with open('test2.out', "a") as f:
         print(clusteringlabels, file=f)
     #v-measure
+    with open('test2_matrix.out', "a") as f:
+        print(mindist, file=f)
 
-def noisedetect(distmatrix, index_set, noise_set):
-    prevlen = len(noise_set)-1
-    counter  = 0
+def noisedetect(distmatrix, index_set, noise_set, MMD_parameter):
+    counter = 0
     while True:
         MMD = 0
         for idx, example in enumerate(distmatrix):
-            if idx in index_set:
+            if idx in index_set and example:
                 MMD = MMD + min(i for i in example if i > 0)
         MMD = MMD/len(index_set)
         for idx, example in enumerate(distmatrix):
-            if min(i for i in example if i > 0) > 2* MMD and idx in index_set:
+            if min(i for i in example if i > 0) > MMD_parameter* MMD and idx in index_set: #MMD-Parameter
                 index_set.remove(idx)
                 noise_set.add(idx)
                 counter += 1

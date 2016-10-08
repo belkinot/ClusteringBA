@@ -30,7 +30,7 @@ def mydist (p1,p2):
     return np.linalg.norm(np.array(p1)-np.array(p2))
 
 def load_mydataset(reverse=False):
-    name = 'aggregation'
+    name = 'moons'
     data = np.genfromtxt(name + '.csv', delimiter=',')
     dataset = data[:, :2]
     #dataset2 = np.concatenate((dataset[::2],dataset[1::2]), axis=0)
@@ -135,3 +135,45 @@ def sse_calculate():
         for j, points in enumerate(vals):
             sse += mydist(clustercenter, points)
         print(sse)
+
+
+def spatial_separation(dataset):
+    labels = reader('test2.out')
+    res = mydist(dataset[0], dataset[1])
+    for enum, i in enumerate(labels):
+        for j in labels[enum+1:]:
+            for example in i:
+                for example2 in j:
+                    minseparation = mydist(dataset[example], dataset[example2])
+                    if res > minseparation:
+                        res = minseparation
+    print(res)
+
+
+#def myradius(centre, radius, dataset):
+
+
+def uniform_density(dataset):
+    mydataset = []
+    edgelist = []
+    labels = reader('test2.out')
+    test = labels[0]
+    for i in test:
+        mydataset += [dataset[i]]
+    for idx in range(len(mydataset)):
+        for idx2 in range(idx+1, len(mydataset)):
+            edgelist += [({idx, idx2}, mydist(mydataset[idx], mydataset[idx2]))]
+    edgelist.sort(key=lambda x: x[1])
+
+    res_dict = dict()
+    for edge in edgelist:
+        idx = edge[0]
+        print(idx)
+        for i in idx:
+            if i in res_dict.keys():
+                res_dict[i] += [1]
+            else:
+                res_dict[i] = [1]
+    print(res_dict)
+
+    print(edgelist[0], edgelist[1])
