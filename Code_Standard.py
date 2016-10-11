@@ -197,13 +197,13 @@ if __name__ == '__main__':
     #dataset = np.random.uniform(0, 10, size=(40, 2))
     start_time = time.time()
     dataset = load_mydataset()
-    dataset2 = load_mydataset(True)
+ #   dataset2 = load_mydataset(True)
 
-    #agglomutualnearestneighbour(dataset2)
-    #noniterative_clustering(dataset,8)
+    #agglomutualnearestneighbour(dataset)
+    noniterative_clustering(dataset, 2)
     #spatial_separation(dataset)
     #0.0128479387995
-    uniform_density(dataset)
+    #uniform_density(dataset)
 
     """test = reader('test.out')
     test2 = reader('test2.out')

@@ -30,9 +30,9 @@ def mydist (p1,p2):
     return np.linalg.norm(np.array(p1)-np.array(p2))
 
 def load_mydataset(reverse=False):
-    name = 'moons'
+    name = 'aggregation'
     data = np.genfromtxt(name + '.csv', delimiter=',')
-    dataset = data[:, :2]
+    dataset = data[:,:2]
     #dataset2 = np.concatenate((dataset[::2],dataset[1::2]), axis=0)
     if reverse:
         dataset = dataset[::-1]
@@ -174,6 +174,21 @@ def uniform_density(dataset):
                 res_dict[i] += [1]
             else:
                 res_dict[i] = [1]
-    print(res_dict)
-
+    #print(res_dict)
     print(edgelist[0], edgelist[1])
+
+
+def degree_connectedness(graph):
+    degreesum = 0
+    mindegree = len(graph)
+    maxdegree = 0
+    for i in range(0,len(graph)):
+        degreesum += graph.degree(i)
+        if graph.degree(i) > maxdegree:
+            maxdegree = graph.degree(i)
+        if graph.degree(i) < mindegree:
+            mindegree = graph.degree(i)
+    degreesum = degreesum/len(graph)
+    print(degreesum)
+    print('min' , mindegree , 'max' , maxdegree)
+    print('graphlength' ,len(graph))

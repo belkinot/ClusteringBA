@@ -43,6 +43,7 @@ def noniterative_clustering(data, MMD_parameter=2):
     #v-measure
     with open('test2_matrix.out', "a") as f:
         print(mindist, file=f)
+    degree_connectedness(graph)
 
 def noisedetect(distmatrix, index_set, noise_set, MMD_parameter):
     counter = 0

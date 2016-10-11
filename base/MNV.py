@@ -42,7 +42,8 @@ def agglomutualnearestneighbour(dataset):
     l = [(x[1][0], x[2][0]) for x in tempcluster]
     #print(l)
     labels = gen_labels(len(dataset), l)
-    print('LABELS' , labels, len(labels))
+    print('labellength', len(labels))
+    print('LABELS' , labels)
     results, _ = gen_results_from_labels(dataset, labels)
     #print(results)
     showres(results)
