@@ -7,11 +7,25 @@ def kmeans(dataset, k):
     for i in range(0,k):
         centre += [dataset[i]]
 
-    #solange clusterzentrne nicht gleich oder solange k-1 clusters nicht gleich
-
+    #solange clusterzentrne nicht gleich oder solange k-1 clusters nicht gleich oder n-iterationen
+    n = 0
     clusters, centre = kmeansdistance(dataset, centre)
-    clusters2 = kmeansdistance(dataset, centre)
-    print(clusters2)
+    oldclusters = 0
+    while n < 300 and not (oldclusters == clusters):
+        oldclusters = clusters
+        clusters, centre = kmeansdistance(dataset, centre)
+        n += 1
+    print(clusters)
+    print(n)
+    clustering = []
+    for example in clusters:
+        helpcluster = [] #needs to be tuple???
+        for iexample in example:
+            helpcluster += dataset[iexample]
+        clustering += [helpcluster]
+
+    print(clustering)
+    #showres(clustering)
 
 
 def kmeansdistance(dataset, centre):
