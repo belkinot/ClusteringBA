@@ -11,6 +11,7 @@ from sklearn.metrics.cluster import adjusted_mutual_info_score, adjusted_rand_sc
 from base.helperfunctions import *
 from base.MMD import *
 from base.MNV import *
+from base.kmeans import *
 from itertools import combinations
 
 import time
@@ -199,8 +200,10 @@ if __name__ == '__main__':
     dataset = load_mydataset()
  #   dataset2 = load_mydataset(True)
 
+
+    kmeans(dataset,2)
     #agglomutualnearestneighbour(dataset)
-    noniterative_clustering(dataset, 2)
+    #noniterative_clustering(dataset, 2)
     #spatial_separation(dataset)
     #0.0128479387995
     #uniform_density(dataset)
