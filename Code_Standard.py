@@ -6,7 +6,7 @@ from scipy.stats import multivariate_normal
 from scipy.cluster.hierarchy import dendrogram
 from sklearn.cluster import KMeans, MeanShift
 from sklearn.metrics.cluster import adjusted_mutual_info_score, adjusted_rand_score, v_measure_score
-
+from sklearn.datasets import load_iris
 
 from base.helperfunctions import *
 from base.MMD import *
@@ -201,9 +201,9 @@ if __name__ == '__main__':
  #   dataset2 = load_mydataset(True)
 
 
-    kmeans(dataset,2)
+    #kmeans(dataset,2)
     #agglomutualnearestneighbour(dataset)
-    #noniterative_clustering(dataset, 2)
+    noniterative_clustering(dataset, 2)
     #spatial_separation(dataset)
     #0.0128479387995
     #uniform_density(dataset)

@@ -30,9 +30,9 @@ def mydist (p1,p2):
     return np.linalg.norm(np.array(p1)-np.array(p2))
 
 def load_mydataset(reverse=False):
-    name = 'moons'
+    name = 'Iris'
     data = np.genfromtxt(name + '.csv', delimiter=',')
-    dataset = data[:,:2]
+    dataset = data[:,:4]
     #dataset2 = np.concatenate((dataset[::2],dataset[1::2]), axis=0)
     if reverse:
         dataset = dataset[::-1]
@@ -46,12 +46,12 @@ def load_dataset_with_labels():
 def showres(result, noise=None):
     colors = get_colors()
     for i, point_list in enumerate(result):
-        x, y = zip(*point_list)
-        plt.scatter(x, y, c=colors[i % len(colors)])
+        coord = list(zip(*point_list))
+        plt.scatter(coord[0], coord[1], c=colors[i % len(colors)])
 
         if noise:
-            x, y = zip(*noise)
-            plt.scatter(x, y, c='b', marker='o')
+            coord = list(zip(*noise))
+            plt.scatter(coord[0], coord[1], c='b', marker='o')
     plt.show()
 
 def get_matrix(size, connected):
@@ -111,13 +111,11 @@ def sklearn_kmeans_sse(labels, dataset):
         print(res_list, file=f)
 
 
-
 def reader(test):
     with open(test, "r") as f:
         for line in f.readlines():
             x = eval(line)
     return x
-
 
 
 def sse_calculate():
