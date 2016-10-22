@@ -1,12 +1,14 @@
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 import matplotlib.pyplot as plt
+from matplotlib.tri import Triangulation
 import networkx as nx
 from scipy.stats import multivariate_normal
 from scipy.cluster.hierarchy import dendrogram
 from sklearn.cluster import KMeans, MeanShift
 from sklearn.metrics.cluster import adjusted_mutual_info_score, adjusted_rand_score, v_measure_score
 from sklearn.datasets import load_iris
+from sklearn.datasets import make_blobs
 
 from base.helperfunctions import *
 from base.MMD import *
@@ -200,9 +202,12 @@ if __name__ == '__main__':
     dataset = load_mydataset()
  #   dataset2 = load_mydataset(True)
 
+    dataset, truelabels = list(make_blobs(1000,2,2))
+    print(dataset)
+    #tri = Triangulation(dataset[:,0], dataset[:,1])
 
-    #kmeans(dataset,2)
-    #agglomutualnearestneighbour(dataset)
+    kmeans(dataset,2)
+    agglomutualnearestneighbour(dataset)
     noniterative_clustering(dataset, 2)
     #spatial_separation(dataset)
     #0.0128479387995
@@ -230,9 +235,9 @@ if __name__ == '__main__':
     #codeStandard(dataset)
     #codeSpecial(dataset)
     #agglomutualnearestneighbour(dataset)
-    #y_pred = KMeans(6).fit_predict(dataset)
+    #y_pred = KMeans(2).fit_predict(dataset)
     #y_pred = MeanShift().fit_predict(dataset)
-    #helperfunctions.sklearn_kmeans_sse(y_pred, dataset)
+    #sklearn_kmeans_sse(y_pred, dataset)
     #res = reader('k_means.out')
     #showres(res)
     #print(y_pred)
