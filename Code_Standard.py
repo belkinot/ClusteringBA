@@ -8,12 +8,16 @@ from scipy.cluster.hierarchy import dendrogram
 from sklearn.cluster import KMeans, MeanShift
 from sklearn.metrics.cluster import adjusted_mutual_info_score, adjusted_rand_score, v_measure_score
 from sklearn.datasets import load_iris
-from sklearn.datasets import make_blobs
+from sklearn.datasets import make_blobs, make_moons
+from scipy.spatial import Delaunay
 
 from base.helperfunctions import *
+from base.MNVnew import *
 from base.MMD import *
 from base.MNV import *
 from base.kmeans import *
+from base.Delaunay_mimic import *
+from base.Delaunay_reduce import *
 from itertools import combinations
 
 import time
@@ -199,36 +203,41 @@ def dendrogrammofclustering(result):
 if __name__ == '__main__':
     #dataset = np.random.uniform(0, 10, size=(40, 2))
     start_time = time.time()
-    dataset = load_mydataset()
+    #dataset = load_mydataset()
  #   dataset2 = load_mydataset(True)
 
-    dataset, truelabels = list(make_blobs(1000,2,2))
-    print(dataset)
-    #tri = Triangulation(dataset[:,0], dataset[:,1])
+   # dataset, truelabels = make_moons(1000, noise=0.06)
+    dataset, truelabels = make_blobs(1000,3,2)
 
-    kmeans(dataset,2)
-    agglomutualnearestneighbour(dataset)
-    noniterative_clustering(dataset, 2)
+    Delaunay_reduce(dataset)
+    #Delaunay_mimic(dataset, 2)
+    #tri = Triangulation(dataset[:,0], dataset[:,1])
+    #tri = Delaunay(dataset)
+    #print(tri)
+    #MNV_algorithm(dataset)
+    #agglomutualnearestneighbour(dataset)
+    #kmeans(dataset,2)
+    #agglomutualnearestneighbour(dataset)
+    #noniterative_clustering(dataset, 2)
     #spatial_separation(dataset)
     #0.0128479387995
     #uniform_density(dataset)
-
-    """test = reader('test.out')
+    """
+    test = reader('test.out')
     test2 = reader('test2.out')
     ls = [-1 for i in range(len(dataset))]
     ls2 = [-1 for i in range(len(dataset))]
     for idx, i in enumerate(test):
-        for j in i:
+        for j , _ in enumerate(i):
             ls[j] = idx
     for idx, i in enumerate(test2):
-        for j in i:
+        for j, _ in enumerate(i):
             ls2[j] = idx
 
     print(ls, "LS")
     print("zwote", ls2)
 
-    print(adjusted_rand_score(ls,ls2[::-1]))
-
+    print(adjusted_rand_score(ls,ls2))
     """
     #dataset = load_dataset_with_labels()
    # plot_true_labels(dataset)

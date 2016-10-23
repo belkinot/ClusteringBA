@@ -1,13 +1,17 @@
 from base.helperfunctions import *
+import time
 
 def agglomutualnearestneighbour(dataset):
+    start_time = time.time()
     #matrix nearest neighbours of each point
     #matrix m1 and D, where neighbourmatrix[0] -> distance, neighbourhoodmatrix[1] --> index of point
     neighbourhoodmatrix = []
-    for pts in dataset:
-        neighbour = []
-        for idx,pts2 in enumerate(dataset):
-            neighbour += [[mydist(pts,pts2),idx]]
+    for i, pts in enumerate(dataset):
+        neighbour = [[mydist(pts, pts2), idx] for idx, pts2 in enumerate(dataset)]
+    #for pts in dataset:
+     #   neighbour = []
+      #  for idx,pts2 in enumerate(dataset):
+       #     neighbour += [[mydist(pts,pts2),idx]]
         neighbour.sort()
         neighbourhoodmatrix += [neighbour]
 
@@ -38,17 +42,19 @@ def agglomutualnearestneighbour(dataset):
                     tempcluster += [[[tempdist],[idx], [neighbourhoodmatrix[idx][i][1]]]]
                 if m2[idx][i] <= 10:
                     counter += 1
-    #print(len(tempcluster),tempcluster)
+    print(len(tempcluster),tempcluster)
+
     l = [(x[1][0], x[2][0]) for x in tempcluster]
-    #print(l)
+    print(l)
     labels = gen_labels(len(dataset), l)
     print('labellength', len(labels))
     print('LABELS' , labels)
     results, _ = gen_results_from_labels(dataset, labels)
     #print(results)
+    print('Zeit' , time.time() - start_time)
     showres(results)
     #np.savetxt('test.out', list(zip(*results)), delimiter=',')  # X is an array
-    with open('test.out', "a") as f:
+    with open('test.out', "w") as f:
         print(results, file=f)
     #print(neighbourhoodmatrix[11])
     #print(m2[0])

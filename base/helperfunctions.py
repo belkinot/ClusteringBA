@@ -30,7 +30,7 @@ def mydist (p1,p2):
     return np.linalg.norm(np.array(p1)-np.array(p2))
 
 def load_mydataset(reverse=False):
-    name = 'Iris'
+    name = 'spiral'
     data = np.genfromtxt(name + '.csv', delimiter=',')
     dataset = data[:,:4]
     #dataset2 = np.concatenate((dataset[::2],dataset[1::2]), axis=0)
