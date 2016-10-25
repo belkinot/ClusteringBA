@@ -22,16 +22,10 @@ from itertools import combinations
 
 import time
 
-
-
-
 #spatial separation abstand kürzester aus sunterschiedlichen clustern
 #connectedness lokale nachbarschaft maximaler abstand dbscan minpts --> connectmaß
 #compactness sse dbsscan- kmeans
 #uniform density - radius um jeden punkt in einem cluster, anzahl der punkt in dem radius sollte einigermaßen gleich sein
-
-
-
 
 #plot
 def myplots(points):
@@ -39,12 +33,14 @@ def myplots(points):
     plt.scatter(x, y)
     plt.show()
 
+
 def plotdemo(points, contour):
     x,y = (zip(*points))
     plt.scatter (x,y, s= 10, c = 'blue', alpha = 1)
     x2,y2 = (zip(*contour))
     plt.scatter(x2, y2, s=10, c='red', alpha=0.7)
     plt.show()
+
 
 def plotdemo2(data,cluster,noncluster):
     x,y = (zip(*data))
@@ -54,7 +50,6 @@ def plotdemo2(data,cluster,noncluster):
     x3,y3 = (zip(*noncluster))
     plt.scatter(x3,y3, s= 10, c = 'green', alpha = 0.5)
     plt.show()
-
 
 
 def codeSpecial(data):
@@ -99,6 +94,7 @@ def codeSpecial(data):
         plotdemo(data, clusterpts)
     else:
         plotdemo2(data, clusterpts, contour)
+
 
 def codeStandard(data):
     mindist = []#minimum distance for each points
@@ -187,7 +183,6 @@ def codeStandard(data):
     plotdemo(data,contour)
 
 
-
 def dendrogrammofclustering(result):
     plt.figure(figsize=(25,10))
     plt.title('Hierarchical Clustering')
@@ -195,8 +190,6 @@ def dendrogrammofclustering(result):
     plt.ylabel('distance')
     dendrogram(result, leaf_rotation=90, leaf_font_size = 8)
     plt.show()
-
-
 
 
 #0,0159077092538
@@ -207,10 +200,10 @@ if __name__ == '__main__':
  #   dataset2 = load_mydataset(True)
 
    # dataset, truelabels = make_moons(1000, noise=0.06)
-    dataset, truelabels = make_blobs(1000,3,2)
+    DATASET, truelabels = make_blobs(1000,2,5)
 
-    Delaunay_reduce(dataset)
-    #Delaunay_mimic(dataset, 2)
+    Delaunay_reduce(DATASET)
+    Delaunay_mimic(DATASET, 2)
     #tri = Triangulation(dataset[:,0], dataset[:,1])
     #tri = Delaunay(dataset)
     #print(tri)
