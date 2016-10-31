@@ -6,6 +6,7 @@ import time
 
 #delaunay triangulation
 def Delaunay_mimic(dataset, threshold):
+    """Delaunay mimics human clustering"""
     start_time = time.time()
     tri = Delaunay(dataset)
     print(tri.simplices)

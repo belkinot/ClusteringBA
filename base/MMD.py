@@ -38,6 +38,9 @@ def noniterative_clustering(data, MMD_parameter=2):
     print('labellength', len(clusteringlabels))
     print("LABELS: ", clusteringlabels)
     print('CLUSTERInG' ,clustering)
+    return clusteringlabels
+
+
     showres(clustering, noiseclusters)
     with open('test2.out', "a") as f:
         print(clusteringlabels, file=f)

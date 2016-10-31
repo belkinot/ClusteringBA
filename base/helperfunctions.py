@@ -30,7 +30,7 @@ def mydist (p1,p2):
     return np.linalg.norm(np.array(p1)-np.array(p2))
 
 def load_mydataset(reverse=False):
-    name = 'spiral'
+    name = 'compound'
     data = np.genfromtxt(name + '.csv', delimiter=',')
     dataset = data[:,:4]
     #dataset2 = np.concatenate((dataset[::2],dataset[1::2]), axis=0)
@@ -118,6 +118,19 @@ def reader(test):
     return x
 
 
+def sse_per_label(DATASET, labels):
+    sse = 0
+    for vals in labels:
+        centre = 0
+        sse_label = 0
+        for i in vals:
+            centre += DATASET[i]
+        centre = centre/len(vals)
+        for j in vals:
+            sse_label += mydist(centre, DATASET[j])**2
+        sse += sse_label/
+    return sse
+
 def sse_calculate():
     x = reader('k_means.out')
     l = 0
@@ -135,8 +148,8 @@ def sse_calculate():
         print(sse)
 
 
-def spatial_separation(dataset):
-    labels = reader('test2.out')
+def spatial_separation(dataset, labels):
+    #labels = reader('test2.out')
     res = mydist(dataset[0], dataset[1])
     for enum, i in enumerate(labels):
         for j in labels[enum+1:]:
@@ -177,6 +190,7 @@ def uniform_density(dataset):
 
 
 def degree_connectedness(graph):
+
     degreesum = 0
     mindegree = len(graph)
     maxdegree = 0
@@ -190,3 +204,13 @@ def degree_connectedness(graph):
     print(degreesum)
     print('min' , mindegree , 'max' , maxdegree)
     print('graphlength' ,len(graph))
+
+
+def get_rand_index_format(dataset, labels):
+    result = [-1 for x in range(len(dataset))]
+    for idx, liste in enumerate(labels):
+        for i in liste:
+            if len(liste) > 1:
+                result[i] = idx
+    return result
+

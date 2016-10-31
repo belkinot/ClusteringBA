@@ -44,6 +44,8 @@ def MNV_algorithm(dataset):
     #g = nx.from_numpy_matrix(admatrix)
     #labels = list(nx.connected_components(g))
     print('LABELS', labels)
+
+    return labels
     results, _ = gen_results_from_labels(dataset, labels)
     print('ZEIT' , time.time() - start_time)
     showres(results)

@@ -14,7 +14,7 @@ def Delaunay_reduce(dataset):
     dist = gen_all_connected(dataset, tri)
     dist.sort()
     sum = 0
-    helpmean = [[] for _ in range(len(dataset))] # variance of all local_means
+    helpmean = [[] for _ in range(len(dataset))] # Kantenlänge JEDER benachbarten Kante von Punkt an der Stelle i
     local_mean = []
     for i in range(0, len(dist), 2):
         value = dist[i][0]
@@ -27,61 +27,98 @@ def Delaunay_reduce(dataset):
         for i in liste:
             val += i
         val = val/len(liste)
-        local_mean += [val]
+        local_mean += [val] # Local_Mean des Punktes i
     global_mean = sum/(len(dist)/2)
     global_variation = 0
     for i in range(0, len(dist), 2): # "remove" duplicates
         global_variation += (dist[i][0] - global_mean)**2 #dist[i][0] is the distance
-    global_variation = global_variation/(len(dist)/2)
-    global_distance_constraint = []
+    global_variation = math.sqrt(global_variation/(len(dist)/2)) # global "variation" laut paper
+    global_distance_constraint = [] # global distance constraint
     for i in range(len(dataset)):
         alpha = global_mean/local_mean[i]
         global_distance_constraint += [global_mean + alpha * global_variation]
     #print(global_distance_constraint)
-    tri_global_reduced = []
-    tri_global_reduced2 = []
+    tri_global_reduced = [] #global reduzierte DT
+    tri_global_reduced2 = [] # Tupelliste der global reduzierten DT
     for i in dist:
         if global_distance_constraint[i[1]] >= i[0]:
             tri_global_reduced += [i]
             tri_global_reduced2 += [(i[1], i[2])]
 
-    local_distance_constraint = [] # [[] for _ in range(len(dataset))]
+    local_distance_constraint = []
     m = get_matrix(len(dataset), tri_global_reduced2)
     graph = nx.from_numpy_matrix(m)
-    nb = [] # direct neighbours
+    nb = [] # Nachbarn des Punkte i
     for i in range(len(dataset)):
         nb += [graph.neighbors(i)]
-    print(nb)
+    #print(nb)
     res_dict = dict()
-    two_order_nb = []
+    two_order_nb = [] # 2er Nachbarschaften
+    # baue Distanzdictionary
     for i, bla in enumerate(nb):
         two_order_nb_list = []
         for j in bla:
-            #if i < j:
-            res_dict[(i, j)] = mydist(dataset[i], dataset[j])
+            res_dict[(i, j)] = mydist(dataset[i], dataset[j]) # distances of all edges in triangulation
             two_order_nb_list += [(i,j)]
             for example in nb[j]:
                 two_order_nb_list += [(j,example)]
         two_order_nb += [two_order_nb_list]
-    print(two_order_nb)
-    two_order_neighborhood = []
+    #print(two_order_nb)
+    two_order_neighborhood = [] # alle Tupel der 2-er Nachbarschaften, keine doppelten Kanten!
     for i in two_order_nb:
         two_order_neighborhood += [set(tuple(sorted(t)) for t in i)]
 
-    print(two_order_neighborhood[0])
-    two_order_mean_list = []
+    #print(two_order_neighborhood[0])
+    two_order_mean_list = [] # Mittelwert der Kantenlänge der 2-er Nachbarschaft des Punkte i
     for i in two_order_neighborhood:
         two_order_mean = 0
         for j in i:
             two_order_mean += res_dict[j]
-        if len(i) != 0:
+        if len(i) != 0: # falls keine Nachbarn mehr vorhanden!
             two_order_mean_list += [two_order_mean/len(i)]
         else:
             two_order_mean_list += [0]
-    print(len(nb))
-    print(len(two_order_neighborhood))
-    print(len(two_order_mean_list))
-    print(len(dataset))
+    #print(len(nb))
+    #print(len(two_order_neighborhood))
+    #print(len(two_order_mean_list))
+    #print(len(dataset))
+
+    local_variance_list = [] # local variance list des Punkte an der Stelle i(1er nachbarschaft)
+    for i in range(len(dataset)):
+        local_variance_help = 0
+        for x in helpmean[i]:
+            local_variance_help += (x-local_mean[i])**2
+        local_variance_help = math.sqrt(local_variance_help/len(helpmean[i]))
+        local_variance_list += [local_variance_help]
+
+    mean_variation = [] # mean-variation der 2er Nachbarschaft des Punktes an der Stelle i
+    for neighbor in nb:
+        mean_variation_help = 0 # standardabweichung der 1er nachbarn
+        two_path_length_neighbor = []
+        for i in neighbor:
+            mean_variation_help += local_variance_list[i]
+            two_path_length_neighbor += nb[i]
+        if (len(neighbor) != 0): # falls kein nachbar vorhanden
+            mean_variation_help = mean_variation_help/len(neighbor)
+        else:
+            mean_variation_help = 0
+        mean_variation_help2 = 0 # standardabweichung der 2er Nachbarn
+        for x in two_path_length_neighbor:
+            mean_variation_help2 += local_variance_list[x]
+        if (len(two_path_length_neighbor) != 0): # falls kein nachbar vorhanden
+            mean_variation_help2 = mean_variation_help2/len(two_path_length_neighbor)
+        else:
+            mean_variation_help2 = 0
+        mean_variation_help += mean_variation_help2
+        mean_variation_help = mean_variation_help/2
+        mean_variation += [mean_variation_help] # mean variation aus dem paper
+    for i in range(len(dataset)):
+        local_distance_constraint += [two_order_mean_list[i] + mean_variation[i]]
+
+
+
+
+    """
     local_variance_list = []
     for idx, i in enumerate(two_order_neighborhood):
         local_variance = 0
@@ -93,7 +130,7 @@ def Delaunay_reduce(dataset):
             local_variance_list += [0]
     for i in range(len(dataset)):
         local_distance_constraint += [two_order_mean_list[i] + local_variance_list[i]]
-
+    """
 
     """
     for i, blub in enumerate(nb):
@@ -126,80 +163,65 @@ def Delaunay_reduce(dataset):
     print(two_order_mean)
 
     """
-    """
-    res_list = []
-    local_mean_variation = []
-    local_mean_constraint = []
-    for idx in range(len(dataset)):
-        set_of_dings = set()
-        for val in end_res:
-            if val[0][2] == idx or val[0][0] == idx:
-                set_of_dings |= {val[1]}
-                set_of_dings |= {val[3]}
-        res_list += [set_of_dings]
-    mean_variation = 0
-    for idx in range(len(dataset)):
-        for mean_value in res_list:
-            for mean_value_v in mean_value:
-                mean_variation += (res_dict[tuple(mean_value_v)]-two_order_mean[idx])**2
-            local_mean_variation += [mean_variation/len(mean_value)]
-            local_distance_constraint += [two_order_mean[idx]+local_mean_variation[idx]]
-#
-    nbb = [set() for _ in range(len(dataset))] # neighbours of neighbours
-    for idx, second in enumerate(nb):
-        nbb[idx] = nbb[idx] | set(second) # füge DIREKTE Nachbarn ein
-        for i in second:
-            nbb[idx] = nbb[idx] | set(nb[i]) # nbb - set of 2nd neighbours
-    edgelist = [] # edgelist for 2-order mean
-    print(len(nbb[99]))
-    print(nbb[99])
-    return
-    for nbbset in nbb:
-        #print(nbbset)
-        edges = [x for x in combinations(nbbset, 2)]
-        print(edges[0])
-        edgelist += [edges]
-    # edgelist is a result of all edges in 2-neighbourhood of edelist[i] which is dataset[i]
-    two_order_mean = [[] for _ in range(len(dataset))] # 2 order mean list
-    mean_variation = []
-    test_time = time.time()
-    for idx, liste in enumerate(edgelist):
-        #calculate two-order mean
-        #two_order_mean_help = 0
-        distance = []
-        mean_variation_help = 0
-        for j in range(len(list)):
-            p1 = liste[j][0]
-            p2 = liste[j][1]
-            distance += [mydist(dataset[p1], dataset[p2])]
-            print(type(distance[0]))
-            #print(len(liste))
-            #two_order_mean_help += mydist(dataset[p1], dataset[p2])
-        #two_order_mean_help = two_order_mean_help/denominator
-        #two_order_mean += [two_order_mean_help]
-        two_order_mean += [np.sum(distance)/len(liste)]
-        #print(two_order_mean)
-        #print(np.sum(distance)/denominator) weniger nachkommastellen!!! 10 statt 16
-        for example in distance:
-            mean_variation_help += (two_order_mean[idx] - example)*(two_order_mean[idx] - example)
 
-        mean_variation += [mean_variation_help/len(liste)]
 
-    print(time.time()-test_time)
-
-    for i in range(len(dataset)):
-        local_distance_constraint[i] = two_order_mean[i] - mean_variation[i]
-    """
-    tri_local_reduced = []
-    tri_local_reduced_tuples = []
+    tri_local_reduced = [] # lokal reduzierte DT
+    tri_local_reduced_tuples = [] # Tupelliste der lokal reduzierten DT
     for i in tri_global_reduced:
         if local_distance_constraint[i[1]] >= i[0]:
             tri_local_reduced += [i]
             tri_local_reduced_tuples += [(i[1], i[2])]
+
+
+    density_indicator_list = [] # density indicator aus dem paper
+    nsdr_list = [] # nsdr aus paper
+    m2= get_matrix(len(dataset), tri_local_reduced_tuples)
+    g2 = nx.from_numpy_matrix(m2)
+    density_nb = [] # alle nachbarn des Punktes an der Stelle i
+    for i in range(len(dataset)):
+        density_nb += [g2.neighbors(i)]
+    nearest_neighbor = []
+    threshold = []
+    for idx, neighbor in enumerate(density_nb): #alle nachbarn
+        nsdr = 0
+        nearest_neighbor_dist_help = []
+        for j in neighbor:
+            nearest_neighbor_dist_help += [res_dict[idx,j]]
+        if len(nearest_neighbor_dist_help) != 0:
+            nearest_neighbor += [min(nearest_neighbor_dist_help)] # nächster nachbar
+        else:
+            nearest_neighbor += [0]
+        std = 0
+        for i in nearest_neighbor_dist_help:
+            std += math.sqrt((nearest_neighbor[idx] - i)**2)
+        if len(nearest_neighbor_dist_help) != 0:
+            std = std/len(nearest_neighbor_dist_help)
+        else:
+            std = 0
+        threshold += [nearest_neighbor[idx] + 3* std]
+
+        for j in neighbor:
+            if res_dict[idx, j] <= threshold[idx]: # überprüfen ob der Punkt spatial directly reachable ist
+                nsdr += 1
+        nsdr_list += [nsdr]
+        if len(density_nb[idx]) != 0:
+            density_indicator_list += [nsdr_list[idx] + nsdr_list[idx] / len(density_nb[idx])]
+        else:
+            density_indicator_list += [0]  # no neighbours
+
+    firstindex = density_indicator_list.index(max(density_indicator_list)) # höchster density_indicator
+
+    # alle nachbarn von diesem index (density_nb[firstindex]
+    # sortiere diese (aber spatially directly reachable, d.h. res_dict[firstindex, diesen nachbarn] < t1 UNd spatially reachable ??
+    #
+
+
+
     labels = gen_labels(len(dataset), tri_local_reduced_tuples)
     print('LABELS', labels)
     result, noise = gen_results_from_labels(dataset, labels)
     print('ZEIT' , time.time()-start_time)
+    return labels
     showres(result, noise)
 
 
