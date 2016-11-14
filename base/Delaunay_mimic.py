@@ -5,17 +5,19 @@ import time
 
 
 #delaunay triangulation
-def Delaunay_mimic(dataset, threshold):
+def Delaunay_mimic(dataset, threshold, triangulation):
     """Delaunay mimics human clustering"""
     start_time = time.time()
-    tri = Delaunay(dataset)
-    print(tri.simplices)
+    #tri = Delaunay(dataset)
+    tri = triangulation
+    #print(tri.simplices)
     dist = gen_all_connected(dataset, tri)
     dist.sort()
 
 
     helpdist = [None for i in range(len(dataset))]
     lauf = len(dataset)
+    # kantenlängen
     for example in dist:
         if not helpdist[example[1]]:
             helpdist[example[1]] = example[0]
@@ -26,19 +28,22 @@ def Delaunay_mimic(dataset, threshold):
         if lauf <= 0:
             break
 
+    # R_1 und R_2 Faktoren aus dem Paper
     reduced_tri = []
     for example in dist:
         r_1 = example[0]/helpdist[example[1]]
         r_2 = example[0]/helpdist[example[2]]
 
-        r_erg = math.sqrt(r_1*r_2)
+        r_erg = math.sqrt(r_1*r_2) # geometrisches Mittel
         if r_erg < threshold:
             reduced_tri += [(example[1], example[2])]
     labels = gen_labels(len(dataset), reduced_tri)
-    print(labels)
+    #print(labels)
     res, noise = gen_results_from_labels(dataset, labels)
-    print('Zeit', time.time()-start_time)
-    showres(res, noise)
+    #print('Zeit', time.time()-start_time)
+
+    return labels
+    #showres(res, noise)
 
 
 

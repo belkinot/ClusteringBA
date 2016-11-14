@@ -63,6 +63,13 @@ def get_matrix(size, connected):
 
     return m
 
+def get_weighted_matrix(size, connected, weights):
+    m = np.zeros((size,size))
+    for t in connected:
+        x,y = min(t), max(t)
+        m[(x,y)] = weights[x][y]
+    return m
+
 def gen_labels(size, connected):
     m = get_matrix(size, connected)
     g = nx.from_numpy_matrix(m)
@@ -78,7 +85,7 @@ def gen_results_from_labels(points, labels):
         else:
             noise += [tuple(points[comp]) for comp in list(labels[i])]
 
-    print(result)
+    #print(result)
     return result, noise
 
 
@@ -128,7 +135,7 @@ def sse_per_label(DATASET, labels):
         centre = centre/len(vals)
         for j in vals:
             sse_label += mydist(centre, DATASET[j])**2
-        sse += sse_label/
+        sse += sse_label/len(vals)
     return sse
 
 def sse_calculate():
@@ -158,8 +165,8 @@ def spatial_separation(dataset, labels):
                     minseparation = mydist(dataset[example], dataset[example2])
                     if res > minseparation:
                         res = minseparation
-    print(res)
-
+    #print(res)
+    return res
 
 #def myradius(centre, radius, dataset):
 
@@ -189,6 +196,21 @@ def uniform_density(dataset):
     print(edgelist[0], edgelist[1])
 
 
+
+def graph_longest_edge(graph):
+    l_edge = 0
+    for i in graph:
+        dicto = graph[i]
+        for word in dicto.keys():
+            #print(word)
+            #print(dicto[word])
+            #print(dicto[word]['weight'])
+            if dicto[word]['weight'] > l_edge:
+                l_edge = dicto[word]['weight']
+    return l_edge
+
+
+
 def degree_connectedness(graph):
 
     degreesum = 0
@@ -201,6 +223,7 @@ def degree_connectedness(graph):
         if graph.degree(i) < mindegree:
             mindegree = graph.degree(i)
     degreesum = degreesum/len(graph)
+    return degreesum, mindegree, maxdegree
     print(degreesum)
     print('min' , mindegree , 'max' , maxdegree)
     print('graphlength' ,len(graph))
@@ -213,4 +236,6 @@ def get_rand_index_format(dataset, labels):
             if len(liste) > 1:
                 result[i] = idx
     return result
+
+
 

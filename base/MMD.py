@@ -1,5 +1,3 @@
-import networkx as nx
-import numpy as np
 from base.helperfunctions import *
 
 
@@ -19,7 +17,7 @@ def noniterative_clustering(data, MMD_parameter=2):
         mindist += [temp]
 
     MMD = noisedetect(mindist, idxset, noiseset, MMD_parameter)
-    print(MMD)
+    #print(MMD)
     adjacency_matrix = []
     for idx, distance in enumerate(mindist):
             adjacency_matrix_help = []
@@ -35,21 +33,25 @@ def noniterative_clustering(data, MMD_parameter=2):
     #graph plotten richtung datensatz
     clusteringlabels = list(nx.connected_components(graph))
     clustering, noiseclusters = gen_results_from_labels(data,clusteringlabels)
-    print('labellength', len(clusteringlabels))
-    print("LABELS: ", clusteringlabels)
-    print('CLUSTERInG' ,clustering)
+    #print('labellength', len(clusteringlabels))
+    #print("LABELS: ", clusteringlabels)
+    #print('CLUSTERInG' ,clustering)
+    #return graph
     return clusteringlabels
 
 
     showres(clustering, noiseclusters)
+    """
     with open('test2.out', "a") as f:
         print(clusteringlabels, file=f)
     #v-measure
     with open('test2_matrix.out', "a") as f:
         print(mindist, file=f)
     degree_connectedness(graph)
+    """
 
 def noisedetect(distmatrix, index_set, noise_set, MMD_parameter):
+    """Erkennt Noise und entfernt diese aus dem Datensatz"""
     counter = 0
     while True:
         MMD = 0
@@ -64,7 +66,7 @@ def noisedetect(distmatrix, index_set, noise_set, MMD_parameter):
                 counter += 1
         if counter == 0:
             break
-        print(counter, "COUNTER")
+        #print(counter, "COUNTER")
         counter = 0
 
     return MMD

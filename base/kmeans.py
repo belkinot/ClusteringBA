@@ -1,7 +1,7 @@
 from base.helperfunctions import *
 import random
 from scipy.spatial import Delaunay
-from scipy.sparse.csgraph import csgraph_from_dense
+from scipy.sparse.csgraph import csgraph_from_dense, minimum_spanning_tree
 import networkx as nx
 from networkx import union
 from base.Delaunay_reduce import gen_all_connected
@@ -15,19 +15,28 @@ def kmeans(dataset, k):
     n = 0
     clusters, centre, labels = kmeansdistance(dataset, centre)
     test_centre = tuple()
-    print(centre)
+    #print(centre)
     while n < 300 and not test_centre == centre:
         test_centre = centre[:]
         clusters, centre, labels = kmeansdistance(dataset, centre)
         n += 1
-    print(clusters)
-    print(n)
+    #print(clusters)
+    #print(n)
     label_set = []
     for jdx, i in enumerate(labels):
         label_set += [set(i)]
-    graph = create_mst(dataset, label_set) # build a graph out of k-means clustering
+    return label_set
+
+
+
+
+
+    # weight is 1 :((((
+    #nx.draw(graph[0])
+    #plt.savefig("path.png")
+
     #degree_connectedness(graph)
-    return (label_set)
+    #return (label_set)
 
 
     #cluster_labels = [set(x) for x in clusters]
@@ -35,28 +44,36 @@ def kmeans(dataset, k):
     showres(clusters)
 
 
-#create graph out of clusters:
+# create graph out of clusters:
 def create_mst(dataset, labels):
     mst = []
     temp_dataset = []
-    graph = nx.Graph()
     for i in labels:
-        for j in i:
-            temp_dataset += [dataset[j]]
-        delaunay_graph = Delaunay(temp_dataset)
-        delaunay_graph = gen_all_connected(temp_dataset, delaunay_graph)
-        delaunay = []
-        for graphes in delaunay_graph:
-            delaunay += [(graphes[1], graphes[2])]
-        m = get_matrix(len(temp_dataset), delaunay)
-        graph2 = nx.from_scipy_sparse_matrix(csgraph_from_dense(m))
-        mst += [nx.minimum_spanning_tree(graph2)]# minimum spanning tree out of graph
-    for subgraph in mst:
-        graph = nx.disjoint_union(graph,subgraph)
+        if len(i) > 3:
+            for j in i:
+                temp_dataset += [dataset[j]]
+            delaunay_graph = Delaunay(temp_dataset)
+            delaunay_graph = gen_all_connected(temp_dataset, delaunay_graph)
+            delaunay = []
+            weight = np.zeros((len(dataset), len(dataset)))
+            for graphes in delaunay_graph:
+                delaunay += [(graphes[1], graphes[2])]
+                weight[(graphes[1], graphes[2])] = graphes[0]
+            m = get_weighted_matrix(len(temp_dataset), delaunay, weight )
+            graph2 = minimum_spanning_tree(m)
+            mst += [graph2]
+        #graph2 = nx.from_scipy_sparse_matrix(csgraph_from_dense(m))
+        #mst += [nx.minimum_spanning_tree(graph2)]# minimum spanning tree out of graph
+    #for subgraph in mst:
+        #graph = nx.disjoint_union(graph,subgraph)
         #graph.add_nodes_from(subgraph.nodes)
         #graph.add_edges_from(subgraph.edges)
-        #graph = nx.union(graph, subgraph)
-    return graph
+        #graph = nx.union(graph, subgraph
+    connectedness = []
+    for i in mst:
+        connectedness += [(np.amax(i.toarray().astype(float)))]
+    return max(connectedness)#, mst
+
 
 def kmeansdistance(dataset, centre):
     clusters = [[] for x in range(len(centre))]

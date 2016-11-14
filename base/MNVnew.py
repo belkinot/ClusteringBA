@@ -36,15 +36,14 @@ def MNV_algorithm(dataset):
                 if 2 <= mnv <= 10:
                     erg += [(index, mnv1)]
 
-    for line in m2:
-        print(line)
+    #for line in m2:
+    #    print(line)
     labels = gen_labels(len(dataset),erg)
-    admatrix = np.matrix(m2)
+    #admatrix = np.matrix(m2)
     #print(admatrix)
     #g = nx.from_numpy_matrix(admatrix)
     #labels = list(nx.connected_components(g))
-    print('LABELS', labels)
-
+    #print('LABELS', labels)
     return labels
     results, _ = gen_results_from_labels(dataset, labels)
     print('ZEIT' , time.time() - start_time)
