@@ -168,16 +168,16 @@ if __name__ == '__main__':
     #print(mylist)
     #print(degree_connectedness(graph))
     #print(degree_connectedness(noniterative_clustering(DATASET, 2)))
-    spatial_sep = reader('result_dbscan_f2c3.out')
-    data = []
-    for i in range(len(spatial_sep)):
-        data += [spatial_sep[i][2]]
-    print(max(data))
-    print(min(data))
-    data2 = [data, data, data]
-    plt.figure()
-    plt.boxplot(data2, showmeans=True, meanline=True)
-    plt.show()
+    #spatial_sep = reader('result_dbscan_f2c3.out')
+    #data = []
+    #for i in range(len(spatial_sep)):
+    #    data += [spatial_sep[i][2]]
+    #print(max(data))
+    #print(min(data))
+    #data2 = [data, data, data]
+    #plt.figure()
+    #plt.boxplot(data2, showmeans=True, meanline=True)
+    #plt.show()
     #boxplot()
     #Delaunay_mimic(DATASET, 2)
     #Delaunay_reduce(DATASET)
