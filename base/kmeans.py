@@ -72,7 +72,7 @@ def create_mst(dataset, labels):
     connectedness = []
     for i in mst:
         connectedness += [(np.amax(i.toarray().astype(float)))]
-    return max(connectedness)#, mst
+    return max(connectedness), mst
 
 
 def kmeansdistance(dataset, centre):
