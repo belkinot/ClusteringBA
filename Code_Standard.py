@@ -1,4 +1,3 @@
-from base.boxplot import *
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 import matplotlib.pyplot as plt
@@ -168,7 +167,7 @@ if __name__ == '__main__':
     #dataset = np.random.uniform(0, 10, size=(40, 2))
     start_time = time.time()
     #cluster_analysis_fixed_dataset(2,3)
-
+    #cluster_analysis(2,2)
     """
     res = reader('Results/2 Dim 3 Clust/dataset_f2c3.out')
     print(len(res))
