@@ -4,7 +4,7 @@ import time
 
 np.set_printoptions(threshold=np.inf)
 
-def MNV_algorithm(dataset):
+def MNV_algorithm(dataset, nearest=5):
     start_time = time.time()
 
     #neighbourhoodmatrix = []
@@ -44,9 +44,8 @@ def MNV_algorithm(dataset):
     #g = nx.from_numpy_matrix(admatrix)
     #labels = list(nx.connected_components(g))
     #print('LABELS', labels)
-    return labels
+    #return labels
     results, _ = gen_results_from_labels(dataset, labels)
     print('ZEIT' , time.time() - start_time)
-    showres(results)
-    with open('test2.out', "w") as f:
-        print(results, file=f)
+    #showres(results)
+    return labels

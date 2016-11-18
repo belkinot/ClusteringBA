@@ -19,10 +19,38 @@ from base.MNV import *
 from base.kmeans import *
 from base.Delaunay_mimic import *
 from base.Delaunay_reduce import *
-from base.DBScan import DBSCANlabels_to_Labels
+from base.DBScan import DBSCANlabels_to_Labels, KMEANSlabels_to_Labels
 from itertools import combinations
 
 import time
+
+def cluster_analysis_fixed_dataset(features, n_clust):
+    start = time.time()
+    sfeature = str(features)
+    scluster = str(n_clust)
+    params = reader('Results/'+ sfeature + ' Dim ' + scluster + ' Clust/dataset_f' + sfeature + 'c' + scluster + '.out')
+    result_kmeans = []
+    for i in range(1000):
+        samples = params[i][0]
+        std = params[i][1]
+        rd_state = params[i][2]
+        DATASET, truelabels = make_blobs(n_samples=samples, n_features=features, centers=n_clust, cluster_std=std,
+                                             random_state=rd_state)
+        y_pred = KMeans(n_clust).fit_predict(DATASET)
+        labels_kmeans = KMEANSlabels_to_Labels(y_pred)
+        spatial_sep_kmeans = spatial_separation(DATASET, labels_kmeans)
+        sse_kmeans = sse_per_label(DATASET, labels_kmeans)
+        rand_index_kmeans = adjusted_rand_score(truelabels, y_pred)
+        mst = create_mst_weighted(DATASET, labels_kmeans)
+        connectedness_kmeans = connectedness(mst)
+
+
+        result_kmeans += [(labels_kmeans,spatial_sep_kmeans, sse_kmeans, rand_index_kmeans, connectedness_kmeans)]
+        print(i)
+        print('Zeit', time.time() - start)
+    with open('result_kmeanslabels+connectivity_f' + sfeature + 'c' + scluster + '.out', 'a') as km:
+        print(result_kmeans, file=km)
+
 
 
 def cluster_analysis(features, n_clust):
@@ -38,13 +66,13 @@ def cluster_analysis(features, n_clust):
         result_mmd = []
         result_mnv = []
         result_dbscan = []
-        result_kmeans = []
+        #result_kmeans = []
 
-        for i in range(100):
+        for j in range(100):
             # samples = parameter[i][0]
             samples = random.randint(100, 1000)
             # std = parameter[i][1]
-            std = random.randint(1, 10)
+            std = random.uniform(0.5, 2)
             # rd_state = parameter[i][2]
             rd_state = random.randint(1, 100000)
             DATASET, truelabels = make_blobs(n_samples=samples, n_features=features, centers=n_clust, cluster_std=std,
@@ -59,27 +87,27 @@ def cluster_analysis(features, n_clust):
             sse2 = sse_per_label(DATASET, labels2)
             rand_index = adjusted_rand_score(truelabels, get_rand_index_format(DATASET, labels))
             rand_index2 = adjusted_rand_score(truelabels, get_rand_index_format(DATASET, labels2))
-            #connectedness, mst = create_mst(DATASET, labels)
-            #connectedness2, mst_2 = create_mst(DATASET, labels2)
+            #connectedness_mimic = connectedness(create_mst_weighted(DATASET, labels))
+            #connectedness2 = connectedness(create_mst_weighted(DATASET,labels))
 
             result_mimic += [(labels,spatial_sep, sse, rand_index)]
-            result_reduce2 += [(labels2, spatial_sep2, sse2, rand_index2)]
+            result_reduce2 += [(labels2, spatial_sep2, sse2,rand_index2)]
 
             # MMD - Algorithm
             labels_mmd = noniterative_clustering(DATASET)
             spatial_sep_mmd = spatial_separation(DATASET, labels_mmd)
             sse_mmd = sse_per_label(DATASET, labels_mmd)
             rand_index_mmd = adjusted_rand_score(truelabels, get_rand_index_format(DATASET, labels_mmd))
-            #connectedness_mmd, mst_mmd = create_mst(DATASET, labels_mmd)
+            #connectedness_mmd = connectedness(create_mst_weighted(DATASET, labels_mmd))
 
-            result_mmd += [(labels_mmd, spatial_sep_mmd, sse_mmd, rand_index_mmd)]
+            result_mmd += [(labels_mmd, spatial_sep_mmd, sse_mmd,rand_index_mmd)]
 
             # MNV-Algorithm
             labels_mnv = MNV_algorithm(DATASET)
             spatial_sep_mnv = spatial_separation(DATASET, labels_mnv)
             sse_mnv = sse_per_label(DATASET, labels_mnv)
             rand_index_mnv = adjusted_rand_score(truelabels, get_rand_index_format(DATASET, labels_mnv))
-            #connectedness_mnv, mst_mnv = create_mst(DATASET, labels_mnv)
+            #connectedness_mnv = connectedness(create_mst_weighted(DATASET, labels_mnv))
 
             result_mnv += [(labels_mnv,spatial_sep_mnv, sse_mnv, rand_index_mnv)]
 
@@ -91,7 +119,7 @@ def cluster_analysis(features, n_clust):
             #connectedness_dbscan, mst_dbscan = create_mst(DATASET, labels_dbscan)
 
             result_dbscan += [(labels_dbscan,spatial_sep_dbscan, sse_dbscan, rand_index_dbscan)]
-
+            """
             # KMEANS- selfimplemented
             labels_kmeans = kmeans(DATASET, n_clust)
             spatial_sep_kmeans = spatial_separation(DATASET, labels_kmeans)
@@ -100,13 +128,13 @@ def cluster_analysis(features, n_clust):
             #connectedness_kmeans, mst_kmeans = create_mst(DATASET, labels_kmeans)
 
             result_kmeans += [(labels_kmeans,spatial_sep_kmeans, sse_kmeans, rand_index_kmeans)]
-
+            """
             params += [(samples, std, rd_state)]
 
-            print('Datensatz', i)
+            print('Datensatz', j, 'reihe', i)
             print('Zeit' , time.time()-starter)
-        with open('dataset_f' + sfeature + 'c' + scluster + '.out', 'a') as f:
-               print(params, file=f)
+        with open('dataset_f' + sfeature + 'c' + scluster + '.out', mode='a') as f:
+             print(params, file=f)
         with open('result_dmimiclabels_f'+ sfeature + 'c' + scluster + 'out', 'a') as ff:
             print(result_mimic, file=ff)
         with open('result__dreduclabels_f' + sfeature + 'c' + scluster + '.out', 'a') as fff:
@@ -117,8 +145,8 @@ def cluster_analysis(features, n_clust):
             print(result_mnv, file=fffff)
         with open('result_dbscanlabels_f' + sfeature + 'c' + scluster + '.out','a') as dbs:
             print(result_dbscan, file=dbs)
-        with open('result_kmeanslabels_f' + sfeature + 'c' + scluster + '.out' , 'a') as km:
-            print(result_kmeans, file=km)
+        #with open('result_kmeanslabels_f' + sfeature + 'c' + scluster + '.out' , 'a') as km:
+        #    print(result_kmeans, file=km)
 
         # boxplots median obere/untere hälfte
         # pseudo code -> nachimplementieren möglich , gemäß gleichung 7 etc
@@ -139,46 +167,76 @@ def cluster_analysis(features, n_clust):
 if __name__ == '__main__':
     #dataset = np.random.uniform(0, 10, size=(40, 2))
     start_time = time.time()
+    #cluster_analysis_fixed_dataset(2,3)
 
-    #cluster_analysis(2,2)
-    #cluster_analysis(2,3)
-    #cluster_analysis(2,4)
-    #cluster_analysis(2,5)
-    #cluster_analysis(2,6)
-    #cluster_analysis(2,7)
-    #cluster_analysis(5,2)
-    #cluster_analysis(3,2)
-    #cluster_analysis(3,3)
-    #cluster_analysis(3,4)
-    #cluster_analysis(3,5)
-    #cluster_analysis(3,6)
+    """
+    res = reader('Results/2 Dim 3 Clust/dataset_f2c3.out')
+    print(len(res))
+    res2 = reader('Results/2 Dim 3 Clust/result_mmd_f2c3.out')
+    data2 = []
+    for i in range(len(res2)):
+        data2 += [res2[i][1]]
+
+    data = []
+    for i in range(len(res)):
+        data += [res[i][1]]
+    sum = 0
+    for i in data:
+        sum += i
+    sum = sum/len(data)
+    print(sum)
+    print(max(data))
+    print(min(data))
+    plotdate = [data,data2]
+    plt.figure()
+    plt.boxplot(data)
+    plt.show()
+
+    """
     #cluster_analysis(3,7)
+
+
     #DATASET = load_mydataset()
+
+    #labels = kmeans(DATASET,2)
+    #connectedness, mst = create_mst(DATASET, labels)
+    #mst2 = create_mst_weighted(DATASET, labels)
+
+    #print(connectedness)
+    #print(type(mst[0]))
+
+    #longest = 0
+    #for i in mst2:
+    #    if graph_longest_edge(i) > longest:
+    #        longest = graph_longest_edge(i)
+    #print(longest)
+
  #   dataset2 = load_mydataset(True)
     #DATASET, truelabels = make_moons(1000, noise=0.06)
-    #DATASET, truelabels = make_blobs(1000,8,5)
+    #DATASET, truelabels = make_blobs(1000,2,5, cluster_std=1, random_state=5)
+    #tri = Delaunay(DATASET)
+    #labels = get_rand_index_format(DATASET,Delaunay_reduce(DATASET, tri))
+    #print(adjusted_rand_score(truelabels, labels))
+    #labels = kmeans(DATASET, 5)
+    #y_pred = KMeans(5).fit_predict(DATASET)
+    #print(y_pred)
+    #print(KMEANSlabels_to_Labels(DATASET,y_pred))
+
     #mylist, mymst=  create_mst(DATASET, kmeans(DATASET,2))
     #mylist, mymst = create_mst(DATASET, MNV_algorithm(DATASET))
     #longest = []
-    #for i in mymst:
-     #   graph = nx.from_scipy_sparse_matrix(i)
-     #   print(degree_connectedness(graph))
+    #for i in mst:
+    #    graph = nx.from_scipy_sparse_matrix(i)
+        #print(degree_connectedness(graph))
     #    longest += [graph_longest_edge(graph)]
     #print(longest)
     #print(mylist)
     #print(degree_connectedness(graph))
     #print(degree_connectedness(noniterative_clustering(DATASET, 2)))
-    #spatial_sep = reader('result_dbscan_f2c3.out')
-    #data = []
-    #for i in range(len(spatial_sep)):
-    #    data += [spatial_sep[i][2]]
-    #print(max(data))
-    #print(min(data))
-    #data2 = [data, data, data]
-    #plt.figure()
-    #plt.boxplot(data2, showmeans=True, meanline=True)
-    #plt.show()
-    #boxplot()
+
+
+
+
     #Delaunay_mimic(DATASET, 2)
     #Delaunay_reduce(DATASET)
 

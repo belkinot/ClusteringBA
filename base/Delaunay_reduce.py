@@ -234,9 +234,9 @@ def Delaunay_reduce(dataset, triangulation):
     #print('LABELS', labels)
     result, noise = gen_results_from_labels(dataset, labels)
     #print('ZEIT' , time.time()-start_time)
-    return labels
-    showres(result, noise)
 
+    #showres(result, noise)
+    return labels
     """temp_density_indicator_list = []
 
     for i in expandingneighbors:

@@ -42,9 +42,8 @@ def Delaunay_mimic(dataset, threshold, triangulation):
     res, noise = gen_results_from_labels(dataset, labels)
     #print('Zeit', time.time()-start_time)
 
-    return labels
     #showres(res, noise)
-
+    return labels
 
 
 

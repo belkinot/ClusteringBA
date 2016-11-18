@@ -37,10 +37,11 @@ def noniterative_clustering(data, MMD_parameter=2):
     #print("LABELS: ", clusteringlabels)
     #print('CLUSTERInG' ,clustering)
     #return graph
+    #return clusteringlabels
+
+
+    #showres(clustering, noiseclusters)
     return clusteringlabels
-
-
-    showres(clustering, noiseclusters)
     """
     with open('test2.out', "a") as f:
         print(clusteringlabels, file=f)

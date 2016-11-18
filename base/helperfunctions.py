@@ -118,10 +118,11 @@ def sklearn_kmeans_sse(labels, dataset):
         print(res_list, file=f)
 
 
-def reader(test):
+def reader(test,):
+    x = []
     with open(test, "r") as f:
         for line in f.readlines():
-            x = eval(line)
+            x += eval(line)
     return x
 
 
@@ -236,6 +237,38 @@ def get_rand_index_format(dataset, labels):
             if len(liste) > 1:
                 result[i] = idx
     return result
+
+# create graph out of clusters:
+def create_mst_weighted(dataset, labels):
+    mst = []
+    temp_dataset = []
+    for i in labels:
+        if len(i) > 2:
+            adjacency_matrix = np.zeros((len(dataset), len(dataset)))
+            mytemplist = []
+            for j in i:
+                mytemplist += [j]
+            for pts, idx in enumerate(mytemplist):
+                for pts2 in range(idx, len(mytemplist)):
+                    adjacency_matrix[pts][pts2] += mydist(dataset[pts], dataset[pts2])
+            graph = nx.from_numpy_matrix(adjacency_matrix)
+            mst += [nx.minimum_spanning_tree(graph)]
+    return mst
+        #graph2 = nx.from_scipy_sparse_matrix(csgraph_from_dense(m))
+        #mst += [nx.minimum_spanning_tree(graph2)]# minimum spanning tree out of graph
+    #for subgraph in mst:
+        #graph = nx.disjoint_union(graph,subgraph)
+        #graph.add_nodes_from(subgraph.nodes)
+        #graph.add_edges_from(subgraph.edges)
+        #graph = nx.union(graph, subgraph
+
+def connectedness(minimumspanning):
+    for graph in minimumspanning:
+        longest = 0
+        temp = graph_longest_edge(graph)
+        if temp > longest:
+            longest = temp
+    return longest
 
 
 
