@@ -32,7 +32,7 @@ def noniterative_clustering(data, MMD_parameter=2):
     graph = nx.from_numpy_matrix(adjacency_matrix_np)
     #graph plotten richtung datensatz
     clusteringlabels = list(nx.connected_components(graph))
-    clustering, noiseclusters = gen_results_from_labels(data,clusteringlabels)
+    #clustering, noiseclusters = gen_results_from_labels(data,clusteringlabels)
     #print('labellength', len(clusteringlabels))
     #print("LABELS: ", clusteringlabels)
     #print('CLUSTERInG' ,clustering)

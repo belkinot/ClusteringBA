@@ -232,7 +232,7 @@ def Delaunay_reduce(dataset, triangulation):
     """
     labels = gen_labels(len(dataset), tri_local_reduced_tuples)
     #print('LABELS', labels)
-    result, noise = gen_results_from_labels(dataset, labels)
+    #result, noise = gen_results_from_labels(dataset, labels)
     #print('ZEIT' , time.time()-start_time)
 
     #showres(result, noise)

@@ -45,7 +45,7 @@ def MNV_algorithm(dataset, nearest=5):
     #labels = list(nx.connected_components(g))
     #print('LABELS', labels)
     #return labels
-    results, _ = gen_results_from_labels(dataset, labels)
-    print('ZEIT' , time.time() - start_time)
+    #results, _ = gen_results_from_labels(dataset, labels)
+    #print('ZEIT' , time.time() - start_time)
     #showres(results)
     return labels

@@ -134,9 +134,9 @@ def cluster_analysis(features, n_clust):
             print('Zeit' , time.time()-starter)
         with open('dataset_f' + sfeature + 'c' + scluster + '.out', mode='a') as f:
              print(params, file=f)
-        with open('result_dmimiclabels_f'+ sfeature + 'c' + scluster + 'out', 'a') as ff:
+        with open('result_dmimiclabels_f'+ sfeature + 'c' + scluster + '.out', 'a') as ff:
             print(result_mimic, file=ff)
-        with open('result__dreduclabels_f' + sfeature + 'c' + scluster + '.out', 'a') as fff:
+        with open('result_dreduclabels_f' + sfeature + 'c' + scluster + '.out', 'a') as fff:
             print(result_reduce2, file=fff)
         with open('result_mmdlabels_f' + sfeature + 'c' + scluster + '.out' , 'a') as ffff:
             print(result_mmd, file=ffff)
@@ -212,9 +212,9 @@ if __name__ == '__main__':
 
  #   dataset2 = load_mydataset(True)
     #DATASET, truelabels = make_moons(1000, noise=0.06)
-    #DATASET, truelabels = make_blobs(1000,2,5, cluster_std=1, random_state=5)
+    #DATASET, truelabels = make_blobs(1000,2,5, cluster_std=0.5, random_state=5)
     #tri = Delaunay(DATASET)
-    #labels = get_rand_index_format(DATASET,Delaunay_reduce(DATASET, tri))
+    #labels = DBSCAN().fit_predict(DATASET)
     #print(adjusted_rand_score(truelabels, labels))
     #labels = kmeans(DATASET, 5)
     #y_pred = KMeans(5).fit_predict(DATASET)
