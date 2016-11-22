@@ -10,7 +10,7 @@ from base.MMD import noniterative_clustering
 from base.Delaunay_mimic import Delaunay_mimic
 from base.Delaunay_reduce import Delaunay_reduce
 from base.DBScan import DBSCANlabels_to_Labels, KMEANSlabels_to_Labels
-from random import random
+import random
 
 import time
 
@@ -208,7 +208,8 @@ def connectivity_calc(features, n_clust):
 if __name__ == '__main__':
     #dataset = np.random.uniform(0, 10, size=(40, 2))
     start_time = time.time()
-    #boxplot_result()
+    boxplot_result(2,3)
+
     #cluster_analysis_fixed_dataset(4,2)
     #cluster_analysis_fixed_dataset(4,3)
     #cluster_analysis_fixed_dataset(4,4)
