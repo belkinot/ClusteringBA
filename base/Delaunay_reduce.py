@@ -174,7 +174,6 @@ def Delaunay_reduce(dataset, triangulation):
             tri_local_reduced += [i]
             tri_local_reduced_tuples += [(i[1], i[2])]
 
-    """
     density_indicator_list = [] # density indicator aus dem paper
     nsdr_list = [] # nsdr aus paper
     m2= get_matrix(len(dataset), tri_local_reduced_tuples)
@@ -213,30 +212,45 @@ def Delaunay_reduce(dataset, triangulation):
         else:
             density_indicator_list += [(0, idx)]  # no neighbours
 
-    #firstindex = density_indicator_list.index(max(density_indicator_list)) # höchster density_indicator
-    maxindex = [i for i,x in enumerate(density_indicator_list) if x == max(density_indicator_list)]
-    print(maxindex)
-
-    mintreshold = threshold[maxindex[0]]
-    firstindex = maxindex[0]
-    for i in maxindex:
-        if threshold[i] < mintreshold:
-            mintreshold = threshold[i]
-            firstindex = i
-    cluster = [firstindex]
-    q = queue.Queue()
-    cluster = density_clusters(dataset, density_indicator_list,density_nb, directly_reachable, threshold, firstindex, cluster,q)
-    print('CLUSTER', cluster)
-    #expandingneighbors = density_nb[firstindex]
-    #print(expandingneighbors)
     """
+    setofallpoints = {x for x in range(len(dataset))}
+    clusters = []
+    densityexpanding(dataset, setofallpoints, density_indicator_list, density_nb, directly_reachable, threshold, clusters)
+    """
+    # cluster = density_clusters(dataset, density_indicator_list,density_nb, directly_reachable, threshold, firstindex, cluster,q)
+    # print('CLUSTER', cluster)
+    # expandingneighbors = density_nb[firstindex]
+    # print(expandingneighbors)
+
     labels = gen_labels(len(dataset), tri_local_reduced_tuples)
-    #print('LABELS', labels)
+    print('LABELS', labels)
     #result, noise = gen_results_from_labels(dataset, labels)
-    #print('ZEIT' , time.time()-start_time)
+    print('ZEIT' , time.time()-start_time)
 
     #showres(result, noise)
     return labels
+
+
+def densityexpanding(dataset, setofallpoints, density_indicator_list, density_nb, directly_reachable, threshold, clusters):
+
+
+    maxindex = [i for i,x in enumerate(density_indicator_list) if x == max(density_indicator_list)]
+    print(maxindex)
+    #density_indicator_list.sort(key=lambda x: x[0], reverse=True)  # höchster density_indicator
+    density_indicator_list[maxindex[0]] = (0,maxindex[0])
+    mintreshold = threshold[maxindex[0]]
+    cluster = {maxindex[0]}
+    q = queue.Queue()
+    tempsort = []
+    for i in density_nb[maxindex[0]]:
+        tempsort += [density_indicator_list[i]]
+    tempsort.sort(key=lambda x: x[0], reverse=True)
+    for i in tempsort:
+        q.put(i[1])
+
+
+
+
     """temp_density_indicator_list = []
 
     for i in expandingneighbors:

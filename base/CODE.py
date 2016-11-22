@@ -154,12 +154,4 @@ def codeStandard(data):
     plotdemo(data,contour)
 
 
-def dendrogrammofclustering(result):
-    plt.figure(figsize=(25,10))
-    plt.title('Hierarchical Clustering')
-    plt.xlabel('sample index')
-    plt.ylabel('distance')
-    dendrogram(result, leaf_rotation=90, leaf_font_size = 8)
-    plt.show()
-
 

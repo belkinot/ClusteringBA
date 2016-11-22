@@ -248,8 +248,8 @@ def create_mst_weighted(dataset, labels):
             mytemplist = []
             for j in i:
                 mytemplist += [j]
-            for pts, idx in enumerate(mytemplist):
-                for pts2 in range(idx, len(mytemplist)):
+            for pts in mytemplist:
+                for pts2 in mytemplist:
                     adjacency_matrix[pts][pts2] += mydist(dataset[pts], dataset[pts2])
             graph = nx.from_numpy_matrix(adjacency_matrix)
             mst += [nx.minimum_spanning_tree(graph)]

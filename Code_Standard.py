@@ -9,12 +9,12 @@ from scipy.spatial import Delaunay
 from sklearn.cluster import KMeans, MeanShift, DBSCAN
 from sklearn.metrics.cluster import adjusted_mutual_info_score, adjusted_rand_score, v_measure_score
 from sklearn.datasets import load_iris
-from sklearn.datasets import make_blobs, make_moons
+from sklearn.datasets import make_blobs, make_moons, make_circles
 
 from base.helperfunctions import *
+from base.MNV import *
 from base.MNVnew import *
 from base.MMD import *
-from base.MNV import *
 from base.kmeans import *
 from base.Delaunay_mimic import *
 from base.Delaunay_reduce import *
@@ -24,6 +24,7 @@ from itertools import combinations
 import time
 
 def cluster_analysis_fixed_dataset(features, n_clust):
+    """Cluster-analyse auf einem bereits festgelegten Datensatz"""
     start = time.time()
     sfeature = str(features)
     scluster = str(n_clust)
@@ -53,11 +54,10 @@ def cluster_analysis_fixed_dataset(features, n_clust):
 
 
 def cluster_analysis(features, n_clust):
+    """cluster-analyse mit 5 algorithmen"""
     sfeature = str(features)
     scluster = str(n_clust)
-    # parameter = reader('testen8dim2cluster.out')
     starter = time.time()
-    # print(parameter[0][0])
     for i in range(10):
         params = []
         result_mimic = []
@@ -68,11 +68,8 @@ def cluster_analysis(features, n_clust):
         #result_kmeans = []
 
         for j in range(100):
-            # samples = parameter[i][0]
             samples = random.randint(100, 1000)
-            # std = parameter[i][1]
             std = random.uniform(0.5, 2)
-            # rd_state = parameter[i][2]
             rd_state = random.randint(1, 100000)
             DATASET, truelabels = make_blobs(n_samples=samples, n_features=features, centers=n_clust, cluster_std=std,
                                              random_state=rd_state)
@@ -151,22 +148,88 @@ def cluster_analysis(features, n_clust):
         # pseudo code -> nachimplementieren möglich , gemäß gleichung 7 etc
 
 
+def boxplot_result(feature, clust):
+    sfeature = str(feature)
+    sclust = str(clust)
+    res_kmean = reader('Results/' +sfeature + ' Dim ' + sclust + ' Clust/result_kmeanslabels+connectivity_f'+sfeature+'c'+sclust+'.out')
+    res_dbscan = reader('Results/' +sfeature + ' Dim ' +sclust + ' Clust/result_dbscanlabels_f'+sfeature+'c'+sclust+'.out')
+    res_mmd = reader('Results/' +sfeature + ' Dim ' +sclust + ' Clust/result_mmdlabels_f'+sfeature+'c'+sclust+'.out')
+    res_mnv = reader('Results/' +sfeature + ' Dim ' +sclust + ' Clust/result_mnvlabels_f'+sfeature+'c'+sclust+'.out')
+    res_dmimic = reader('Results/' +sfeature + ' Dim ' +sclust + ' Clust/result_dmimiclabels_f'+sfeature+'c'+sclust+'.out')
+    res_dreduce = reader('Results/' +sfeature + ' Dim ' +sclust + ' Clust/result_dreduclabels_f'+sfeature+'c'+sclust+'.out')
 
+    res_data_kmean = evaluate(res_kmean, 1)
+    res_data_dbscan = evaluate(res_dbscan, 1)
+    res_data_mmd = evaluate(res_mmd, 1)
+    res_data_mnv = evaluate(res_mnv, 1)
+    res_data_dmimic = evaluate(res_dmimic, 1)
+    res_data_dreduce = evaluate(res_dreduce, 1)
 
+    plotdata = [res_data_kmean,res_data_dbscan,res_data_mmd, res_data_mnv, res_data_dmimic, res_data_dreduce]
+    plt.figure()
+    plt.boxplot(plotdata)
+    plt.show()
 #spatial separation abstand kürzester aus sunterschiedlichen clustern
 #connectedness lokale nachbarschaft maximaler abstand dbscan minpts --> connectmaß
 
+def evaluate(data, idx):
+    """gebe Ergebnisse für ein bestimmtes Maß aus den Textdateien aus"""
+    res_data = []
+    for i in range(len(data)):
+        res_data += [data[i][idx]] # welches Kriterium soll evaluiert werden (0 - labels, 1 spatial_sep, 2 sse, 3 randscore, 4 wenn vorhanden connectedness
+    return res_data
 
- # längste kante im Graph / MST
 
+def connectivity_calc(features, n_clust):
+    sfeature = str(features)
+    scluster = str(n_clust)
+    data = reader('Results/'+sfeature+ ' Dim '+ scluster + ' Clust/dataset_f' +sfeature +'c'+ scluster+ '.out')
+    data_mmd = reader('Results/' +sfeature+ ' Dim '+ scluster + ' Clust/result_mmdlabels_f' +sfeature +'c'+ scluster+ '.out')
+    data_mnv = reader('Results/'+sfeature+ ' Dim '+ scluster + ' Clust/result_mnvlabels_f' +sfeature +'c'+ scluster+ '.out')
+    data_dmimic = reader('Results/'+sfeature+ ' Dim '+ scluster + ' Clust/result_dmimiclabels_f' +sfeature +'c'+ scluster+ '.out')
+    data_dreduc = reader('Results/'+sfeature+ ' Dim '+ scluster + ' Clust/result_dreduclabels_f' +sfeature +'c'+ scluster+ '.out')
+    data_dbscan = reader('Results/'+sfeature+ ' Dim '+ scluster + ' Clust/result_dbscanlabels_f' +sfeature +'c'+ scluster+ '.out')
+    data_kmeans = reader('Results/'+sfeature+ ' Dim '+ scluster + ' Clust/result_kmeanslabels+connectivity_f'+sfeature+'c'+scluster+'.out')
+    connectres = []
+    for i in range(len(data)):
+        DATASET, truelabels = make_blobs(n_samples=data[i][0], n_features=features, centers=n_clust, cluster_std=data[i][1], random_state=data[i][2])
+        labels_mmd = data_mmd[i][0]
+        labels_mnv = data_mnv[i][0]
+        labels_dmimic = data_dmimic[i][0]
+        labels_dreduc = data_dreduc[i][0]
+        labels_dbscan = data_dbscan[i][0]
+        labels_true = KMEANSlabels_to_Labels(truelabels)
 
+        connect_true = connectedness(create_mst_weighted(DATASET,labels_true))
+        connect_mmd = connectedness(create_mst_weighted(DATASET, labels_mmd))
+        connect_mnv = connectedness(create_mst_weighted(DATASET, labels_mnv))
+        connect_dmimic = connectedness(create_mst_weighted(DATASET, labels_dmimic))
+        connect_dreduc = connectedness(create_mst_weighted(DATASET, labels_dreduc))
+        connect_dbscan = connectedness(create_mst_weighted(DATASET, labels_dbscan))
+        connect_kmeans = data_kmeans[i][4]
+        connectres += [(connect_true, connect_mmd, connect_mnv, connect_dmimic, connect_dreduc, connect_dbscan, connect_kmeans)]
+        print(i)
+    with open('connectedness_f'+sfeature+'clust'+scluster+'.out', 'a') as f:
+        print(connectres ,file=f)
 #compactness sse dbsscan- kmeans
 #uniform density - radius um jeden punkt in einem cluster, anzahl der punkt in dem radius sollte einigermaßen gleich sein
 
 if __name__ == '__main__':
     #dataset = np.random.uniform(0, 10, size=(40, 2))
     start_time = time.time()
-    #cluster_analysis_fixed_dataset(2,3)
+
+    #boxplot_result()
+    #cluster_analysis_fixed_dataset(4,2)
+    #cluster_analysis_fixed_dataset(4,3)
+    #cluster_analysis_fixed_dataset(4,4)
+    #cluster_analysis_fixed_dataset(4,5)
+    #cluster_analysis_fixed_dataset(4,6)
+    #cluster_analysis_fixed_dataset(4,7)
+    #connectivity_calc(3,2)
+    #connectivity_calc(3,3)
+    #connectivity_calc(3,4)
+    #connectivity_calc(3,5)
+    #connectivity_calc(3,6)
     #cluster_analysis(2,2)
     """
     res = reader('Results/2 Dim 3 Clust/dataset_f2c3.out')
@@ -211,9 +274,13 @@ if __name__ == '__main__':
     #print(longest)
 
  #   dataset2 = load_mydataset(True)
-    #DATASET, truelabels = make_moons(1000, noise=0.06)
-    #DATASET, truelabels = make_blobs(1000,2,5, cluster_std=0.5, random_state=5)
+    #DATASET, truelabels = make_circles(1000,noise=0.06, factor= 0.5)
+    #DATASET, truelabels = make_moons(500, noise=0.06)
+    DATASET, truelabels = make_blobs(1000,2,7, cluster_std=0.8, random_state=5)
+    mnv_algorithm(DATASET)
+    noniterative_clustering(DATASET)
     #tri = Delaunay(DATASET)
+    #Delaunay_mimic(DATASET, 1.65, tri)
     #labels = DBSCAN().fit_predict(DATASET)
     #print(adjusted_rand_score(truelabels, labels))
     #labels = kmeans(DATASET, 5)

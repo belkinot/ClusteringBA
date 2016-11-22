@@ -10,7 +10,6 @@ def Delaunay_mimic(dataset, threshold, triangulation):
     start_time = time.time()
     #tri = Delaunay(dataset)
     tri = triangulation
-    #print(tri.simplices)
     dist = gen_all_connected(dataset, tri)
     dist.sort()
 
@@ -20,10 +19,10 @@ def Delaunay_mimic(dataset, threshold, triangulation):
     # kantenlängen
     for example in dist:
         if not helpdist[example[1]]:
-            helpdist[example[1]] = example[0]
+            helpdist[example[1]] = example[0] # kürzeste Kantenlänge
             lauf -= 1
         if not helpdist[example[2]]:
-            helpdist[example[2]] = example[0]
+            helpdist[example[2]] = example[0] # kürzeste Kantenlänge
             lauf -= 1
         if lauf <= 0:
             break
@@ -34,9 +33,9 @@ def Delaunay_mimic(dataset, threshold, triangulation):
         r_1 = example[0]/helpdist[example[1]]
         r_2 = example[0]/helpdist[example[2]]
 
-        r_erg = math.sqrt(r_1*r_2) # geometrisches Mittel
+        r_erg = math.sqrt(r_1*r_2) # geometrisches Mittel der Faktoren
         if r_erg < threshold:
-            reduced_tri += [(example[1], example[2])]
+            reduced_tri += [(example[1], example[2])] # alle Kanten nach der Reduktion
     labels = gen_labels(len(dataset), reduced_tri)
     #print(labels)
     #res, noise = gen_results_from_labels(dataset, labels)

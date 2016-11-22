@@ -8,10 +8,6 @@ def agglomutualnearestneighbour(dataset):
     neighbourhoodmatrix = []
     for i, pts in enumerate(dataset):
         neighbour = [[mydist(pts, pts2), idx] for idx, pts2 in enumerate(dataset)]
-    #for pts in dataset:
-     #   neighbour = []
-      #  for idx,pts2 in enumerate(dataset):
-       #     neighbour += [[mydist(pts,pts2),idx]]
         neighbour.sort()
         neighbourhoodmatrix += [neighbour]
 
@@ -53,10 +49,5 @@ def agglomutualnearestneighbour(dataset):
     #print(results)
     print('Zeit' , time.time() - start_time)
     showres(results)
-    #np.savetxt('test.out', list(zip(*results)), delimiter=',')  # X is an array
-    with open('test.out', "w") as f:
-        print(results, file=f)
-    #print(neighbourhoodmatrix[11])
-    #print(m2[0])
-    #print(counter)
+    return labels
 
